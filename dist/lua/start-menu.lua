@@ -35,6 +35,7 @@ local function h(i, j, k, l)
 		local p = vim.api.nvim_replace_termcodes(k .. "<Ignore>", true, false, true)
 		vim.api.nvim_feedkeys(p, "t", false)
 	end
+
 	return { type = "button", val = j, on_press = o, opts = n }
 end
 

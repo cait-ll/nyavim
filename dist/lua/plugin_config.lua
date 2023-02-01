@@ -40,7 +40,7 @@ local Z = require("lspconfig")
 local _ = require("rust-tools")
 local a0 = require("null-ls")
 local a1 = require("typescript")
-local cmp = require'cmp'
+local cmp = require("cmp")
 local function a2(a3, a4) end
 
 local function a5(a3, a4)
@@ -71,72 +71,77 @@ table.remove(a6, 12)
 
 local luasnip = require("luasnip")
 
-luasnip.snippets = require('luasnip_snippets').load_snippets()
+luasnip.snippets = require("luasnip_snippets").load_snippets()
 
 cmp.setup({
-  snippet = {
-    expand = function(args)
-      require("luasnip").lsp_expand(args.body)
-    end,
-  },
-  mapping = {
-    ["<CR>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        if cmp.get_selected_entry() then cmp.complete() end
-      elseif luasnip.expand_or_jumpable() then
-        luasnip.expand_or_jump()
-      else
-        fallback()
-      end
-    end, {"i"}),
-    ["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_next_item()
-      else
-        fallback()
-      end
-    end, {"i"}),
-    ["<S-Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.select_prev_item()
-      else
-        fallback()
-      end
-    end, {"i"}),
-    ["<S-Down>"] = cmp.mapping.scroll_docs(4),
-    ["<S-Up>"] = cmp.mapping.scroll_docs(-4)
-  },
-  window = {
-    completion = {
-      winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
-      col_offset = -3,
-      side_padding = 0,
-    },
-  },
-  formatting = {
-    fields = { "kind", "abbr", "menu" },
-    format = function(entry, vim_item)
-      local kind = require("lspkind").cmp_format({ mode = "symbol_text", maxwidth = 50 })(entry, vim_item)
-      local strings = vim.split(kind.kind, "%s", { trimempty = true })
-      kind.kind = " " .. (strings[1] or "") .. " "
-      kind.menu = "    (" .. (strings[2] or "") .. ")"
+	snippet = {
+		expand = function(args)
+			require("luasnip").lsp_expand(args.body)
+		end,
+	},
+	mapping = {
+		["<CR>"] = cmp.mapping(function(fallback)
+			if cmp.visible() then
+				local entry = cmp.get_selected_entry()
+				if entry then
+					cmp.confirm()
+				else
+					fallback()
+				end
+			elseif luasnip.expand_or_jumpable() then
+				luasnip.expand_or_jump()
+			else
+				fallback()
+			end
+		end, { "i" }),
+		["<Tab>"] = cmp.mapping(function(fallback)
+			if cmp.visible() then
+				cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+			else
+				fallback()
+			end
+		end, { "i" }),
+		["<S-Tab>"] = cmp.mapping(function(fallback)
+			if cmp.visible() then
+				cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+			else
+				fallback()
+			end
+		end, { "i" }),
+		["<S-Down>"] = cmp.mapping.scroll_docs(4),
+		["<S-Up>"] = cmp.mapping.scroll_docs(-4),
+	},
+	window = {
+		completion = {
+			winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
+			col_offset = -3,
+			side_padding = 0,
+		},
+	},
+	formatting = {
+		fields = { "kind", "abbr", "menu" },
+		format = function(entry, vim_item)
+			local kind = require("lspkind").cmp_format({ mode = "symbol_text", maxwidth = 50 })(entry, vim_item)
+			local strings = vim.split(kind.kind, "%s", { trimempty = true })
+			kind.kind = " " .. (strings[1] or "") .. " "
+			kind.menu = "    (" .. (strings[2] or "") .. ")"
 
-      return kind
-    end,
-  },
-  sources = {
-    { name = "luasnip" },
-    { name = "nvim_lsp" },
-    { name = "path" },
-    { name = "emoji" },
-    { name = "buffer" }
-  }
+			return kind
+		end,
+	},
+	sources = {
+		{ name = "luasnip" },
+		{ name = "nvim_lsp" },
+		{ name = "path" },
+		{ name = "emoji" },
+		{ name = "buffer" },
+	},
 })
 
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 for Q, a7 in ipairs(a6) do
-	Z[a7].setup({capabilities = capabilities})
+	Z[a7].setup({ capabilities = capabilities })
 end
 _.setup({ tools = { hover_actions = { auto_focus = true } }, server = { on_attach = a5 } })
 a1.setup({ server = { on_attach = a2 } })
@@ -188,22 +193,28 @@ local a8 = function()
 	end
 	return ab
 end
-require("lualine").setup({ options = { theme = a8(), ignore_focus = { "NvimTree" }, disabled_filetypes = { statusline = {}, winbar = {}, tabline = {}, ["NvimTree"] = {} } } })
-require("nvim-tree").setup({
-  filters = {
-    dotfiles = true,
-  }
+require("lualine").setup({
+	options = {
+		theme = a8(),
+		ignore_focus = { "NvimTree" },
+		disabled_filetypes = { statusline = {}, winbar = {}, tabline = {}, ["NvimTree"] = {} },
+	},
 })
-local ad = require("legendary")
-local ae = require("telescope.builtin")
-local af = function()
+require("nvim-tree").setup({
+	filters = {
+		dotfiles = true,
+	},
+})
+local legend = require("legendary")
+local tsb = require("telescope.builtin")
+local hover_menu = function()
 	if vim.bo.filetype == "rust" then
 		require("rust-tools").hover_actions.hover_actions()
 	else
 		vim.lsp.buf.hover()
 	end
 end
-local ag = function()
+local code_action_menu = function()
 	if vim.bo.filetype == "rust" then
 		require("rust-tools").code_action_group.code_action_group()
 	else
@@ -212,65 +223,63 @@ local ag = function()
 end
 
 local has_words_before = function()
-  unpack = unpack or table.unpack
-  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+	unpack = unpack or table.unpack
+	local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+	return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
-
-
 
 require("scope").setup()
 
 require("bufferline").setup({
-  options = {
-    diagnostics = "nvim_lsp",
-    offsets = {
-      {
-        filetype = "NvimTree",
-        text = "File Manager",
-        text_align = "center",
-        separator = true,
-      }
-    },
-    indicator = {
-      style = "underline"
-    }
-  },
+	options = {
+		diagnostics = "nvim_lsp",
+		offsets = {
+			{
+				filetype = "NvimTree",
+				text = "File Manager",
+				text_align = "center",
+				separator = true,
+			},
+		},
+		indicator = {
+			style = "underline",
+		},
+	},
 })
 
-local ah = require("telescope.pickers")
-local ai = require("telescope.finders")
-local aj = require("telescope.config").values
-local ak = require("telescope.actions")
-local al = require("telescope.actions.state")
-local am = {}
-am["Join Lines"] = _.join_lines.join_lines
-am["Expand Macro"] = _.expand_macro.expand_macro
-am["Open Cargo.toml"] = _.open_cargo_toml.open_cargo_toml
-am["Go To Parent Module"] = _.parent_module.parent_module
-am["Run"] = _.runnables.runnables
-local an = function(n)
+local pick = require("telescope.pickers")
+local fd = require("telescope.finders")
+local tsconf = require("telescope.config").values
+local tsact = require("telescope.actions")
+local tsact_state = require("telescope.actions.state")
+local rt_actions = {}
+rt_actions["Join Lines"] = _.join_lines.join_lines
+rt_actions["Expand Macro"] = _.expand_macro.expand_macro
+rt_actions["Open Cargo.toml"] = _.open_cargo_toml.open_cargo_toml
+rt_actions["Go To Parent Module"] = _.parent_module.parent_module
+rt_actions["Run"] = _.runnables.runnables
+local rust_tools_menu = function(n)
 	n = n or {}
 	if not n.theme then
 		n = require("telescope.themes").get_cursor(n)
 	end
-	ah.new(n, {
+	pick.new(n, {
 		prompt_title = "Rust Tools",
-		finder = ai.new_table({
+		finder = fd.new_table({
 			results = { "Join Lines", "Expand Macro", "Open Cargo.toml", "Go To Parent Module", "Run" },
 		}),
-		sorter = aj.generic_sorter(n),
+		sorter = tsconf.generic_sorter(n),
 		attach_mappings = function(ao)
-			ak.select_default:replace(function()
-				ak.close(ao)
-				local ap = al.get_selected_entry()[1]
-				am[ap]()
+			tsact.select_default:replace(function()
+				tsact.close(ao)
+				local ap = tsact_state.get_selected_entry()[1]
+				rt_actions[ap]()
 			end)
 			return true
 		end,
 	}):find()
 end
-local aq = {
+local vg_actions = {
 	"Open Buffer Diff",
 	"Open Buffer Blame",
 	"Open Buffer History",
@@ -286,7 +295,7 @@ local aq = {
 	"Open Commit Menu",
 	"Toggle Gutter Signs",
 }
-local ar = {
+local vg_action_map = {
 	["Open Buffer Diff"] = "buffer_diff_preview",
 	["Open Buffer Blame"] = "buffer_blame_preview",
 	["Open Buffer History"] = "buffer_history_preview",
@@ -302,35 +311,38 @@ local ar = {
 	["Open Commit Menu"] = "project_commit_preview",
 	["Toggle Gutter Signs"] = "toggle_live_gutter",
 }
-local as = function()
-	vim.ui.select(aq, { prompt = "VGit Action Menu" }, function(at)
-		vim.cmd("VGit " .. ar[at])
+local vg_menu = function()
+	vim.ui.select(vg_actions, { prompt = "VGit Action Menu" }, function(cmd)
+		vim.cmd("VGit " .. vg_action_map[cmd])
 	end)
 end
 require("which-key").setup()
-ad.setup({
+legend.setup({
 	keymaps = {
 		{ "<leader>fe", ":NvimTreeToggle<CR>", description = "Opens the file explorer window" },
-		{ "<leader>ge", ae.git_files, description = "Opens the git file explorer" },
-		{ "<leader>bl", ae.buffers, description = "Opens the buffer list" },
-		{ "<leader>ff", ae.old_files, description = "Lists previously open files" },
-		{ "<leader>qf", ae.quickfix, description = "Opens the quickfix window" },
+		{ "<leader>ge", tsb.git_files, description = "Opens the git file explorer" },
+		{ "<leader>bl", tsb.buffers, description = "Opens the buffer list" },
+		{ "<leader>ff", tsb.old_files, description = "Lists previously open files" },
+		{ "<leader>qf", tsb.quickfix, description = "Opens the quickfix window" },
 		{
 			"<leader>ld",
-			ae.lsp_definitions,
+			tsb.lsp_definitions,
 			description = "Finds the definition of the word under the cursor using LSP",
 		},
-		{ "<leader>D", ae.diagnostics, description = "Opens the diagnostics window" },
-		{ "<leader>gs", ae.git_status, description = "Opens the git status window" },
+		{ "<leader>D", tsb.diagnostics, description = "Opens the diagnostics window" },
+		{ "<leader>gs", tsb.git_status, description = "Opens the git status window" },
 		{ "<leader>db", require("dapui").toggle, description = "Toggles the debugging UI" },
-		{ "<leader>h", af, description = "Opens the hover action menu/focuses if open" },
-		{ "<leader>c", ag, description = "Opens the code action menu/focuses if open" },
+		{ "<leader>h", hover_menu, description = "Opens the hover action menu/focuses if open" },
+		{ "<leader>c", code_action_menu, description = "Opens the code action menu/focuses if open" },
 		{ "<leader>ir", vim.lsp.buf.rename, description = "Opens the rename menu for the item under the cursor" },
-		{ "<leader>tr", an, description = "Opens the rust-tools.nvim menu" },
+		{ "<leader>tr", rust_tools_menu, description = "Opens the rust-tools.nvim menu" },
 		{ "<leader>td", ":Twilight<CR>", description = "Toggles dimming of inactive code" },
 		{ "<leader>lr", require("telescope").extensions.projects.projects, description = "Lists known repositories" },
 		{ "<leader>sr", require("spectre").open, description = "Opens the search/replace menu" },
-		{ "<leader>gm", as, description = "Opens the visual git menu" },
+		{ "<leader>gm", vg_menu, description = "Opens the visual git menu" },
+		{ "b<Right>", ":bnext<CR>", description = "Goes to next buffer" },
+		{ "b<Left>", ":bprev<CR>", description = "Goes to previous buffer" },
+		{ "<leader>bd", ":bd<CR>", description = "Closes current buffer (if unchanged)" },
 	},
 })
 require("which-key").setup()

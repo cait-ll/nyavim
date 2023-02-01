@@ -2,6 +2,7 @@ require("packer").startup(function(use)
 	use({
 		"wbthomason/packer.nvim",
 		"nvim-lua/plenary.nvim",
+		"norcalli/nvim-colorizer.lua",
 		"nvim-tree/nvim-web-devicons",
 		"neovim/nvim-lspconfig",
 		"williamboman/mason.nvim",
@@ -37,22 +38,22 @@ require("packer").startup(function(use)
 		"folke/neodev.nvim",
 		"j-hui/fidget.nvim",
 		"nvim-lualine/lualine.nvim",
-    "tiagovla/scope.nvim",
-    "akinsho/bufferline.nvim",
-    "nvim-tree/nvim-tree.lua",
-    "hrsh7th/nvim-cmp",
-    "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-nvim-lsp",
-    "hrsh7th/cmp-path",
-    "hrsh7th/cmp-emoji",
-    "saadparwaiz1/cmp_luasnip",
-    "molleweide/LuaSnip-snippets.nvim",
+		"tiagovla/scope.nvim",
+		"akinsho/bufferline.nvim",
+		"nvim-tree/nvim-tree.lua",
+		"hrsh7th/nvim-cmp",
+		"hrsh7th/cmp-buffer",
+		"hrsh7th/cmp-nvim-lsp",
+		"hrsh7th/cmp-path",
+		"hrsh7th/cmp-emoji",
+		"saadparwaiz1/cmp_luasnip",
+		"molleweide/LuaSnip-snippets.nvim",
 	})
-  use {
-    "L3MON4D3/LuaSnip",
-    tag = "v1.*",
-    run = "make install_jsregexp",
-  }
+	use({
+		"L3MON4D3/LuaSnip",
+		tag = "v1.*",
+		run = "make install_jsregexp",
+	})
 	use({ "nvim-telescope/telescope.nvim", branch = "0.1.x" })
 	use({
 		"nvim-treesitter/nvim-treesitter",
@@ -70,4 +71,3 @@ require("packer").startup(function(use)
 end)
 
 require("plugin_config")
-
