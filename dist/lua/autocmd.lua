@@ -9,8 +9,11 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 	callback = function()
-		if vim.lsp.get_active_clients()[1].server_capabilities.documentFormattingProvider then
-			vim.lsp.buf.format()
+		local client = vim.lsp.get_active_clients()[1]
+		if client then
+			if client.server_capabilities.documentFormattingProvider then
+				vim.lsp.buf.format()
+			end
 		end
 	end,
 })
